@@ -21,11 +21,6 @@ export const AppRouter = () => {
                     path={APP_ROUTES.help.route}
                     element={APP_ROUTES.help.element}
                 />
-                {/* Catch-all route to redirect to home if no route matches */}
-                <Route 
-                    path="*" 
-                    element={<Navigate to={APP_ROUTES.home.route} replace />} 
-                />
             </Routes>
         </BrowserRouter>
     );
