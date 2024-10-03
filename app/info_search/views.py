@@ -24,7 +24,6 @@ class ScrapePageView(APIView):
 
     def post(self, request):
         url = request.data.get('url') 
-        
         if not url:
             return Response({"error": "URL parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
