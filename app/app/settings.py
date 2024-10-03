@@ -80,7 +80,7 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": "postgres",
-        "HOST": "app-db",
+        "HOST": "info-search-app-db",
         "PORT": "5432",
     },
 }

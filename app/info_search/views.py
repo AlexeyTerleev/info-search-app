@@ -1,11 +1,13 @@
 import requests
 
 from bs4 import BeautifulSoup
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from info_search.models import Page
 from info_search.serializers import PageSerializer
+
 
 
 class ScrapePageView(APIView):
@@ -49,3 +51,68 @@ class ScrapePageView(APIView):
         title_tag = soup.find('title')
         page_title = title_tag.text.strip() if title_tag else url
         return page_title, text_content
+    
+
+
+class PageSearchAPIView(APIView):
+
+    def parse_query(self, query):
+        OPERATORS = {
+            'OR': (1, lambda x, y: Q(x | y)),
+            'AND': (2, lambda x, y: Q(x & y)),
+            'NOT': (3, lambda x: Q(~x))
+        }
+
+        def parse(formula_string: str):
+            for sign in formula_string.replace("(", " ( ").replace(")", " ) ").split():
+                if sign != " ":
+                    yield sign
+
+        def shunting_yard(parsed_formula):
+            stack = []
+            for token in parsed_formula:
+                if token in OPERATORS:
+                    while (stack and stack[-1] != "(" and
+                           OPERATORS[token][0] <= OPERATORS[stack[-1]][0]):
+                        yield stack.pop()
+                    stack.append(token)
+                elif token == ")":
+                    while stack:
+                        element = stack.pop()
+                        if element == "(":
+                            break
+                        yield element
+                elif token == "(":
+                    stack.append(token)
+                else:
+                    yield token
+            while stack:
+                yield stack.pop()
+
+        def calc(polish):
+            stack = []
+            for token in polish:
+                if token in OPERATORS:
+                    if token == 'NOT':
+                        first = stack.pop()
+                        stack.append(OPERATORS[token][1](first))
+                    else:
+                        second, first = stack.pop(), stack.pop()
+                        stack.append(OPERATORS[token][1](first, second))
+                else:
+                    stack.append(Q(content__icontains=token))
+            return stack[0] if stack else Q()
+        
+        return calc(shunting_yard(parse(query)))
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '')  # Get search query from query parameters
+        search_results = []
+        
+        if query:  # Only parse and search if there is a query
+            search_filter = self.parse_query(query)
+            print(search_filter)
+            search_results = Page.objects.filter(search_filter).distinct()
+        
+        serializer = PageSerializer(search_results, many=True)
+        return Response(serializer.data)
