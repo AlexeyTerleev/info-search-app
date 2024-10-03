@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from info_search.models import Page
-from info_search.serializers import PageSerializer
+from info_search.serializers import PageSerializer, SearchSerializer
 
 
 
@@ -113,6 +113,8 @@ class PageSearchAPIView(APIView):
             search_filter = self.parse_query(query)
             print(search_filter)
             search_results = Page.objects.filter(search_filter).distinct()
+
         
-        serializer = PageSerializer(search_results, many=True)
+        
+        serializer = SearchSerializer(search_results, context={'search_filter': query}, many=True)
         return Response(serializer.data)
