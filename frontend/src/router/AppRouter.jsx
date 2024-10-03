@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { APP_ROUTES } from "../consts";
 
 export const AppRouter = () => {
@@ -20,6 +20,11 @@ export const AppRouter = () => {
                 <Route
                     path={APP_ROUTES.help.route}
                     element={APP_ROUTES.help.element}
+                />
+                {/* Catch-all route to redirect to home if no route matches */}
+                <Route 
+                    path="*" 
+                    element={<Navigate to={APP_ROUTES.home.route} replace />} 
                 />
             </Routes>
         </BrowserRouter>
