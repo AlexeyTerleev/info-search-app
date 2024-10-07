@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Input, notification, Button } from "antd";
+import { notification } from "antd";
 import NavBar from "../../components/NavBar/NavBar";
+import SearchButton from "../../components/SearchButton/SearchButton";
 import API from "../../api/api";
+import SearchInput from "../../components/SearchInput/SearchInput";
 
 const AddPage = () => {
     const [url, setUrl] = useState("");
@@ -30,28 +32,22 @@ const AddPage = () => {
             style={{
                 display: "flex",
                 flexDirection: "column",
-                minHeight: "100vh",
             }}
         >
             <NavBar />
-            <h2 style={{ marginBottom: "20px" }}>Добавить элемент</h2>
-            <Input
-                placeholder="Введите URL..."
+
+            <h1>Добавить элемент</h1>
+
+            <SearchInput
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                style={{
-                    width: "100%",
-                    maxWidth: "400px",
-                    marginBottom: "20px",
-                }}
+                setValue={setUrl}
+                placeholder={"Введите URL..."}
             />
-            <Button
-                type="primary"
+
+            <SearchButton
                 onClick={handleParsePage}
-                style={{ width: "20%" }}
-            >
-                Обработать
-            </Button>
+                description={"Обработать"}
+            />
         </div>
     );
 };
