@@ -14,10 +14,32 @@ const FilteredPageList = () => {
         try {
             const response = await API.search(value);
             const data = await response.data;
+            categorizeCoincidences(data);
             setPages(data);
         } catch (error) {
             console.error("Ошибка при получении данных:", error);
         }
+    };
+
+    const categorizeCoincidences = (data) => {
+        const newSameWords = new Set();
+        const newWordParts = new Set();
+
+        data.forEach((page) => {
+            if (Array.isArray(page.coincidences)) {
+                page.coincidences.forEach((coincidence) => {
+                    const isHighlighted = coincidence
+                        .split(" ")
+                        .includes(value);
+                    (isHighlighted ? newSameWords : newWordParts).add(
+                        coincidence
+                    );
+                });
+            }
+
+            page.sameWords = [...newSameWords];
+            page.wordParts = [...newWordParts];
+        });
     };
 
     return (

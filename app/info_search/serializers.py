@@ -13,7 +13,7 @@ class SearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Page
-        fields = ["id", "url", "title", "coincidences"]
+        fields = ["id", "url", "title", "last_scraped", "coincidences"]
 
     def get_coincidences(self, obj):
         search_filter = self.context.get('search_filter', '')
